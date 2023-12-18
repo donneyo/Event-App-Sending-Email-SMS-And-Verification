@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0">
+
+	<title>Login - Event App</title>
+	
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/fontawesome/all.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/style.css}" />
+	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}" ></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}" ></script>
+</head>
+<body>
+<div class="container-fluid text-center">
+
+	<div>
+		<img th:src="@{/images/EABig2.png}" />
+	</div>
+	
+	<form th:action="@{/login}" method="post" style="max-width: 350px; margin: 0 auto">
+		<div th:if="${param.error}">
+			<p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
+		</div>
+		<div th:if="${param.logout}">
+			<p class="text-warning">You have been logged out.</p>
+		</div>
+		
+		<div class="border border-secondary rounded p-3">
+			<p>Access to Event App</p>
+			<p>
+				<input type="email" name="email" class="form-control" placeholder="E-mail" required />
+			</p>
+			<p>
+				<input type="password" name="password" class="form-control" placeholder="Password" required />
+			</p>
+			<p>
+				<input type="submit" value="Login" class="btn btn-primary btn-user btn-block" />
+			</p>			
+		</div>
+	</form>
+	
+	<div>&nbsp;</div>
+	
+	
+	<form th:action="@{/checkCode}" method="post"  style="max-width: 350px; margin: 0 auto"
+	onsubmit="return doesCodeExist(this);">
+		<div class="border border-secondary rounded p-3">
+		<p>Access to Verify Code</p>
+		<p>
+			<input type="text" id="verificationCode" class="form-control" name="verificationCode"
+			placeholder="Enter code" />
+			
+					 
+		</p>
+		
+		<div class="text-center">
+			<input type="submit" value="Verify" class="btn btn-primary btn-user btn-block">
+			
+         </div>     
+         
+		</div>
+	</form>
+	
+	 <div class="modal fade" id="validModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Valid Code</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Welcome, this is a VALID code... Please proceed to the reeption</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+     <div class="modal fade" id="invalidModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Invalid Code</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Invalid code!!!, Something is not right. Please step aside</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+		<div>&nbsp;</div>
+		<div th:replace="fragments :: modal_dialog"></div>
+	
+	
+	<div class="text-center">
+		<p>Event App - Copyright &copy; event</p>
+	</div>
+</div>	
+	
+<script type="text/javascript">
+	
+
+		contextPath = "[[@{/}]]";
+
+		
+		function doesCodeExist(form) {
+			url = contextPath + "login/check_doescode_match";
+			codeVerification = $("#verificationCode").val();
+			csrfValue = $("input[name='_csrf']").val();
+			
+			params = {verificationCode: codeVerification, _csrf: csrfValue};
+			
+			$.post(url, params, function(response) {
+				if (response == "true") {
+					showValidDialog();
+				} else if (response == "false"){
+					showInvalidDialog();
+				}else {
+					showErrorModal("Your code no work Oga");	
+				}
+			}).fail(function() {
+				showErrorModal("Could not connect to the server");
+			});
+			
+			return false;
+		}		
+		
+		
+		
+</script>
+<script type="text/javascript" th:src="@{/js/common_modal.js}"></script>	
+
+</body>
+</html>
